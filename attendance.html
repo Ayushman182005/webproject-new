@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance — Attendance Pro</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">Attendance Pro</div>
+    <nav>
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="students.html"><i class="fas fa-user-graduate"></i> Students</a>
+      <a href="attendance.html" class="active"><i class="fas fa-check-circle"></i> Attendance</a>
+      <div class="nav-label" style="margin-top:auto;">Account</div>
+      <a href="index.html" class="logout-link" style="margin-top:8px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">AD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Admin User</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar-new">
+      <h2 class="page-title">Mark Attendance</h2>
+      <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+      <div class="topbar-right">
+        <div class="time-box" id="dateTime"></div>
+        <div class="status-box">System Online</div>
+      </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header" style="padding:24px 28px 0;">
+      <div class="page-header-left">
+        <h1>Today's Attendance</h1>
+        <p id="attDateLabel" style="color:var(--text3); font-size:13px; margin-top:3px;"></p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchAtt" placeholder="Search student…"/>
+        </div>
+
+        <!-- Status filter pills -->
+        <div class="filter-row">
+          <button class="filter-btn active" id="fAll"     onclick="setAttFilter('all')">All</button>
+          <button class="filter-btn"        id="fNone"    onclick="setAttFilter('none')">Not Marked</button>
+          <button class="filter-btn"        id="fPresent" onclick="setAttFilter('Present')">Present</button>
+          <button class="filter-btn"        id="fLate"    onclick="setAttFilter('Late')">Late</button>
+          <button class="filter-btn"        id="fAbsent"  onclick="setAttFilter('Absent')">Absent</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BULK ACTION BAR -->
+    <div class="bulk-bar" style="margin:16px 28px 0; border-radius:var(--radius); border:1px solid #3b82f630;">
+      <span>Bulk Actions:</span>
+      <button class="btn btn-green btn-sm" onclick="markAllPresent()">
+        <i class="fas fa-check-double"></i> All Present
+      </button>
+      <button class="btn btn-amber btn-sm" onclick="bulkMarkAll('Late')">
+        <i class="fas fa-clock"></i> All Late
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="bulkMarkAll('Absent')">
+        <i class="fas fa-times"></i> All Absent
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="clearAllAttendance()" style="margin-left:auto;">
+        <i class="fas fa-undo"></i> Reset All
+      </button>
+    </div>
+
+    <!-- SUMMARY CHIPS -->
+    <div style="display:flex; gap:12px; padding:16px 28px 0; flex-wrap:wrap;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; gap:8px; align-items:center;">
+        <span style="width:9px; height:9px; border-radius:50%; background:var(--green); display:block;"></span>
+        <span style="font-size:13px; color:var(--text2);">Present:</span>
+        <span id="sumPresent" style="font-family:var(--font-mono); font-weight:600; color:var(--green);">0</span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; gap:8px; align-items:center;">
+        <span style="width:9px; height:9px; border-radius:50%; background:var(--amber); display:block;"></span>
+        <span style="font-size:13px; color:var(--text2);">Late:</span>
+        <span id="sumLate" style="font-family:var(--font-mono); font-weight:600; color:var(--amber);">0</span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; gap:8px; align-items:center;">
+        <span style="width:9px; height:9px; border-radius:50%; background:var(--red); display:block;"></span>
+        <span style="font-size:13px; color:var(--text2);">Absent:</span>
+        <span id="sumAbsent" style="font-family:var(--font-mono); font-weight:600; color:var(--red);">0</span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; gap:8px; align-items:center;">
+        <span style="width:9px; height:9px; border-radius:50%; background:var(--purple); display:block;"></span>
+        <span style="font-size:13px; color:var(--text2);">Leave:</span>
+        <span id="sumLeave" style="font-family:var(--font-mono); font-weight:600; color:var(--purple);">0</span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; gap:8px; align-items:center; margin-left:auto;">
+        <span style="font-size:13px; color:var(--text2);">Not Marked:</span>
+        <span id="sumNone" style="font-family:var(--font-mono); font-weight:600; color:var(--text3);">0</span>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE TABLE -->
+    <div class="page-body" style="padding-top:16px;">
+      <div class="table-box" style="animation:fadeUp .4s ease both;">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Dept</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th style="min-width:330px;">Mark Attendance</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceMarkList"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- script.js FIRST — loads all global functions and window.onload -->
+<script src="script.js"></script>
+
+<!-- Page-specific code AFTER script.js -->
+<script>
+  // ── State for this page only ──────────────────────────────
+  var attFilter = 'all';
+  var attSearch = '';
+
+  // ── Date label ────────────────────────────────────────────
+  var dateLabel = document.getElementById('attDateLabel');
+  if (dateLabel) {
+    dateLabel.textContent = new Date().toLocaleDateString('en-IN', {
+      weekday:'long', day:'numeric', month:'long', year:'numeric'
+    });
+  }
+
+  // ── Live search ───────────────────────────────────────────
+  document.getElementById('searchAtt').addEventListener('input', function(e) {
+    attSearch = e.target.value.toLowerCase();
+    renderFilteredAttendance();
+  });
+
+  // ── Filter pills ──────────────────────────────────────────
+  function setAttFilter(f) {
+    attFilter = f;
+    ['fAll','fNone','fPresent','fLate','fAbsent'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    });
+    var map = { all:'fAll', none:'fNone', Present:'fPresent', Late:'fLate', Absent:'fAbsent' };
+    var active = document.getElementById(map[f]);
+    if (active) active.classList.add('active');
+    renderFilteredAttendance();
+  }
+
+  // ── Render the attendance table with search + filter ──────
+  function renderFilteredAttendance() {
+    var list = document.getElementById('attendanceMarkList');
+    if (!list) return;
+
+    // No students at all
+    if (students.length === 0) {
+      list.innerHTML = '<tr><td colspan="5"><div class="empty-state">'
+        + '<i class="fas fa-check-circle"></i>'
+        + '<p>No students found. <a href="students.html" style="color:var(--accent);">Add students first →</a></p>'
+        + '</div></td></tr>';
+      updateSummary();
+      return;
+    }
+
+    // Build list with original index preserved
+    var filtered = students.map(function(s, i) {
+      return Object.assign({}, s, { _i: i });
+    });
+
+    // Apply search
+    if (attSearch) {
+      filtered = filtered.filter(function(s) {
+        return s.name.toLowerCase().includes(attSearch)
+          || s.roll.toLowerCase().includes(attSearch)
+          || (s.dept || '').toLowerCase().includes(attSearch);
+      });
+    }
+
+    // Apply status filter
+    if (attFilter !== 'all') {
+      filtered = filtered.filter(function(s) {
+        var st = attendance[s._i] || '';
+        if (attFilter === 'none') return st === '';
+        return st === attFilter;
+      });
+    }
+
+    // Nothing matches
+    if (filtered.length === 0) {
+      list.innerHTML = '<tr><td colspan="5"><div class="empty-state">'
+        + '<i class="fas fa-filter"></i>'
+        + '<p>No students match this filter.</p>'
+        + '</div></td></tr>';
+      updateSummary();
+      return;
+    }
+
+    // Build rows
+    list.innerHTML = filtered.map(function(s) {
+      var status = attendance[s._i] || '';
+      var time   = status
+        ? new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})
+        : '—';
+
+      return '<tr id="att-row-' + s._i + '">'
+
+        // Student name + roll
+        + '<td>'
+        + '<div style="display:flex; align-items:center; gap:10px;">'
+        + '<div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#6366f1);'
+        + 'display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0;">'
+        + s.name.charAt(0).toUpperCase()
+        + '</div>'
+        + '<div>'
+        + '<div style="font-weight:600; font-size:13px;">' + s.name + '</div>'
+        + '<div style="font-size:11px; color:var(--text3);">' + s.roll + '</div>'
+        + '</div></div></td>'
+
+        // Dept
+        + '<td><span class="tag">' + (s.dept || 'CSE') + '</span></td>'
+
+        // Time
+        + '<td id="att-time-' + s._i + '" style="font-family:var(--font-mono); font-size:12px; color:var(--text3);">' + time + '</td>'
+
+        // Status badge
+        + '<td id="att-status-' + s._i + '">'
+        + (status
+          ? '<span class="badge ' + status.toLowerCase() + '">' + status + '</span>'
+          : '<span class="badge not-marked">— Not Marked</span>')
+        + '</td>'
+
+        // Action buttons
+        + '<td><div class="att-actions">'
+        + '<button class="btn btn-green btn-sm" onclick="doMark(' + s._i + ',\'Present\')">'
+        + '<i class="fas fa-check"></i> Present</button>'
+        + '<button class="btn btn-amber btn-sm" onclick="doMark(' + s._i + ',\'Late\')">'
+        + '<i class="fas fa-clock"></i> Late</button>'
+        + '<button class="btn btn-danger btn-sm" onclick="doMark(' + s._i + ',\'Absent\')">'
+        + '<i class="fas fa-times"></i> Absent</button>'
+        + '<button class="btn btn-purple btn-sm" onclick="doMark(' + s._i + ',\'Leave\')">'
+        + '<i class="fas fa-calendar-minus"></i> Leave</button>'
+        + '</div></td>'
+
+        + '</tr>';
+    }).join('');
+
+    updateSummary();
+  }
+
+  // ── Mark a student and refresh ────────────────────────────
+  function doMark(i, status) {
+    // Update state + localStorage (markStatus is defined in script.js)
+    markStatus(i, status);
+    // Refresh table and summary
+    renderFilteredAttendance();
+  }
+
+  // ── Bulk mark ALL students a status ───────────────────────
+  function bulkMarkAll(status) {
+    if (students.length === 0) { showToast('No students to mark', 'error'); return; }
+    students.forEach(function(_, i) { attendance[i] = status; });
+    saveAttendance();
+    renderFilteredAttendance();
+    showToast('All students marked ' + status, 'success');
+  }
+
+  // ── Summary chips ─────────────────────────────────────────
+  function updateSummary() {
+    var vals    = Object.values(attendance);
+    var present = vals.filter(function(a) { return a === 'Present'; }).length;
+    var late    = vals.filter(function(a) { return a === 'Late'; }).length;
+    var absent  = vals.filter(function(a) { return a === 'Absent'; }).length;
+    var leave   = vals.filter(function(a) { return a === 'Leave'; }).length;
+    var none    = students.length - (present + late + absent + leave);
+
+    function s(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+    s('sumPresent', present);
+    s('sumLate',    late);
+    s('sumAbsent',  absent);
+    s('sumLeave',   leave);
+    s('sumNone',    Math.max(0, none));
+  }
+
+  // ── Override window.onload for THIS page ──────────────────
+  // script.js sets window.onload — we replace it here so this
+  // page gets renderFilteredAttendance instead of renderAttendance
+  window.onload = function() {
+    updateDateTime();        // clock (from script.js)
+    renderFilteredAttendance();
+    updateSummary();
+  };
+</script>
+
+</body>
+</html>

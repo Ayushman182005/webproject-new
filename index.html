@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Pro — Login</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <span>◈</span> Attendance<span>Pro</span>
+    </div>
+    <p class="login-sub">Sign in to your dashboard</p>
+
+    <div class="login-form">
+
+      <div>
+        <label for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" placeholder="admin@school.edu"
+          onkeydown="if(event.key==='Enter') login()"/>
+      </div>
+
+      <div>
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password"
+          onkeydown="if(event.key==='Enter') login()"/>
+      </div>
+
+      <div style="text-align:right; margin-top:-6px;">
+        <a href="#" style="font-size:12px; color:var(--accent); text-decoration:none;">Forgot password?</a>
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="login()">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+
+    </div>
+
+    <p class="login-demo">
+      Demo credentials? <span onclick="fillDemo()">Click to fill →</span>
+    </p>
+
+    <div style="text-align:center; margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+      <button class="dark-btn" onclick="toggleDarkMode()" style="font-size:13px; padding:6px 14px;">
+        🌙 Toggle Theme
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

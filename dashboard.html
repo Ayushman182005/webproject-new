@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Attendance Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">Attendance Pro</div>
+    <nav>
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="students.html"><i class="fas fa-user-graduate"></i> Students</a>
+      <a href="attendance.html"><i class="fas fa-check-circle"></i> Attendance</a>
+      <div class="nav-label" style="margin-top:auto;">Account</div>
+      <a href="index.html" class="logout-link" style="margin-top:8px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">AD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Admin User</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar-new">
+      <h2 class="page-title">Dashboard</h2>
+      <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+      <div class="topbar-right">
+        <div class="time-box" id="dateTime"></div>
+        <div class="status-box">System Online</div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div style="padding:24px 28px 0;">
+      <div class="cards">
+        <div class="card blue">
+          <div class="card-icon"><i class="fas fa-users"></i></div>
+          <p>Total Students</p>
+          <h2 id="totalStudents">0</h2>
+        </div>
+        <div class="card green">
+          <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+          <p>Present Today</p>
+          <h2 id="presentCount">0</h2>
+        </div>
+        <div class="card orange">
+          <div class="card-icon"><i class="fas fa-clock"></i></div>
+          <p>Late</p>
+          <h2 id="lateCount">0</h2>
+        </div>
+        <div class="card yellow">
+          <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+          <p>Attendance %</p>
+          <h2 id="attendancePercent">0%</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD GRID -->
+    <div class="dashboard-grid">
+
+      <!-- LEFT -->
+      <div class="left">
+
+        <!-- Today's Attendance Table -->
+        <div class="table-box">
+          <h3>
+            Today's Attendance
+            <span id="todayDate" style="font-size:12px; font-weight:400; color:var(--text3); font-family:var(--font-mono);"></span>
+          </h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Time In</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceList"></tbody>
+          </table>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="box">
+          <h3>Quick Actions</h3>
+          <div style="padding:16px 20px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="attendance.html" class="btn btn-primary">
+              <i class="fas fa-check-circle"></i> Mark Attendance
+            </a>
+            <a href="students.html" class="btn btn-ghost">
+              <i class="fas fa-user-plus"></i> Add Student
+            </a>
+            <button class="btn btn-green" onclick="markAllPresent()">
+              <i class="fas fa-check-double"></i> Mark All Present
+            </button>
+            <button class="btn btn-ghost" onclick="exportCSV()">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right">
+
+        <!-- Donut Chart -->
+        <div class="box distribution-box">
+          <div class="dist-title">Distribution</div>
+          <div class="distribution-content">
+            <div class="chart-wrapper">
+              <canvas id="attendanceChart"></canvas>
+              <div class="chart-center">
+                <h2 id="centerPercent">0%</h2>
+                <p>Present</p>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <span class="dot green"></span>
+                <span>Present</span>
+                <span class="legend-val" id="presentLegend">0</span>
+              </div>
+              <div class="legend-item">
+                <span class="dot yellow"></span>
+                <span>Late</span>
+                <span class="legend-val" id="lateLegend">0</span>
+              </div>
+              <div class="legend-item">
+                <span class="dot red"></span>
+                <span>Absent</span>
+                <span class="legend-val" id="absentLegend">0</span>
+              </div>
+              <div class="legend-item">
+                <span class="dot gray"></span>
+                <span>Leave</span>
+                <span class="legend-val" id="leaveLegend">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="box">
+          <h3>Activity Feed</h3>
+          <div id="activityFeed"></div>
+        </div>
+
+      </div>
+
+    </div><!-- /dashboard-grid -->
+
+  </main>
+</div>
+
+<!-- script.js runs window.onload which calls all init functions -->
+<script src="script.js"></script>
+
+<!-- Page-specific code runs AFTER script.js -->
+<script>
+  // Set today's date label (runs after DOM + script.js loaded)
+  var dateEl = document.getElementById('todayDate');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-IN', {
+      weekday:'long', day:'numeric', month:'long', year:'numeric'
+    });
+  }
+
+  // Export CSV function (only needed on dashboard)
+  function exportCSV() {
+    if (students.length === 0) { showToast('No data to export', 'error'); return; }
+    var csv = 'Name,Roll No,Department,Status,Time\n';
+    students.forEach(function(s, i) {
+      var status = attendance[i] || 'Not Marked';
+      var time   = status !== 'Not Marked' ? new Date().toLocaleTimeString() : '—';
+      csv += '"' + s.name + '","' + s.roll + '","' + (s.dept||'CSE') + '","' + status + '","' + time + '"\n';
+    });
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url;
+    a.download = 'attendance_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    showToast('CSV exported successfully', 'success');
+  }
+</script>
+
+</body>
+</html>

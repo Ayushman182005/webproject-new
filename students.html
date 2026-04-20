@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students — Attendance Pro</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">Attendance Pro</div>
+    <nav>
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="students.html" class="active"><i class="fas fa-user-graduate"></i> Students</a>
+      <a href="attendance.html"><i class="fas fa-check-circle"></i> Attendance</a>
+      <div class="nav-label" style="margin-top:auto;">Account</div>
+      <a href="index.html" class="logout-link" style="margin-top:8px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">AD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Admin User</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar-new">
+      <h2 class="page-title">Students</h2>
+      <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+      <div class="topbar-right">
+        <div class="time-box" id="dateTime"></div>
+        <div class="status-box">System Online</div>
+      </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header" style="padding:24px 28px 0;">
+      <div class="page-header-left">
+        <h1>Student Roster</h1>
+        <p id="studentCount" style="color:var(--text3); font-size:13px; margin-top:3px;">0 students</p>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchStudents" placeholder="Search by name, roll, dept…"/>
+        </div>
+
+        <!-- Department Filter -->
+        <select id="deptFilter" onchange="applyDeptFilter()" style="width:140px;">
+          <option value="all">All Depts</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="MECH">MECH</option>
+          <option value="CIVIL">CIVIL</option>
+          <option value="IT">IT</option>
+          <option value="MBA">MBA</option>
+        </select>
+
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="fas fa-user-plus"></i> Add Student
+        </button>
+
+      </div>
+    </div>
+
+    <!-- STUDENTS TABLE -->
+    <div class="page-body" style="padding-top:20px;">
+      <div class="table-box" style="animation:fadeUp .4s ease both;">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Roll No</th>
+              <th>Dept</th>
+              <th>Year</th>
+              <th>Today's Attendance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentList"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-overlay hidden" id="addStudentModal">
+  <div class="modal">
+    <h3><i class="fas fa-user-plus" style="color:var(--accent); margin-right:8px;"></i>Add New Student</h3>
+    <div class="modal-form">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label for="studentName">Full Name *</label>
+          <input type="text" id="studentName" placeholder="e.g. Riya Verma"
+            onkeydown="if(event.key==='Enter') addStudent()"/>
+        </div>
+        <div class="form-group">
+          <label for="studentRoll">Roll Number *</label>
+          <input type="text" id="studentRoll" placeholder="e.g. CS303"
+            onkeydown="if(event.key==='Enter') addStudent()"/>
+        </div>
+        <div class="form-group">
+          <label for="studentDept">Department</label>
+          <select id="studentDept">
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="MECH">MECH</option>
+            <option value="CIVIL">CIVIL</option>
+            <option value="IT">IT</option>
+            <option value="MBA">MBA</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="studentYear">Year</label>
+          <select id="studentYear">
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addStudent()">
+        <i class="fas fa-plus"></i> Add Student
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Modal helpers
+  function openAddModal() {
+    document.getElementById('addStudentModal').classList.remove('hidden');
+    setTimeout(function() { document.getElementById('studentName').focus(); }, 100);
+  }
+  function closeAddModal() {
+    document.getElementById('addStudentModal').classList.add('hidden');
+    // Clear inputs
+    document.getElementById('studentName').value = '';
+    document.getElementById('studentRoll').value = '';
+  }
+
+  // Close modal when clicking the dark backdrop
+  document.getElementById('addStudentModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddModal();
+  });
+
+  // Dept filter
+  function applyDeptFilter() {
+    studentFilter = document.getElementById('deptFilter').value;
+    renderStudents();
+  }
+
+  // Keyboard shortcuts: N = open modal, Esc = close modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'n' && !['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) {
+      openAddModal();
+    }
+    if (e.key === 'Escape') closeAddModal();
+  });
+</script>
+
+</body>
+</html>
